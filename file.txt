@@ -1,1 +1,41 @@
-hello
+from django.shortcuts import render
+from django.http import HttpResponse
+from math import *
+
+# Create your views here.
+def home(request):
+    return render(request,'webapp/getValues.html',{'title':'RegularFalsi'})
+def Falsi(request):
+    funct=request.POST['function']
+    a=float(request.POST['num1'])
+    b=float(request.POST['num2'])
+    A=a
+    B=b
+    rep={'^':'**','ln':'log','sec':'1/cos','cosec':'1/sin','cot':'1/tan','root':'sqrt','sin-1':'asin','cos-1':'acos','tan-1':'atan' }
+    for i,j in rep.items() :
+        funct=funct.replace(i,j)
+    def fun(a,mathexp=funct):
+        mathexp=mathexp.replace('x',str(a))
+        return eval(mathexp)
+    def regular_falsi(funct,a,b):
+        # global x1
+        prev_x=a
+        if fun(a)*fun(b)<0:
+            x1=(a*fun(b)-b*fun(a))/(fun(b)-fun(a))
+            while(True):
+                x1=(a * fun(b) - b * fun(a)) / (fun(b) - fun(a))
+                if ((fun(a) < 0 and fun(x1) < 0) or (fun(a) > 0 and fun(x1) > 0)):
+                    a=x1
+                elif ((fun(b) < 0 and fun(x1) < 0) or fun(b) > 0 and fun(x1) > 0):
+                    b=x1
+                if(abs(prev_x-x1)<0.00009):
+                    break
+                prev_x=x1
+            return "{:.4f} is the approximate root for curve {}  between points {} and {}".format(x1,funct,A,B)
+        else:
+            return "For given a and b, 'y' values are same.Try again"
+            
+    res=regular_falsi(funct,a,b)
+
+
+    return render(request,'webapp/result.html',{'result':res})
